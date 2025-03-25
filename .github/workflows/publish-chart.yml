@@ -51,34 +51,3 @@ jobs:
           
           # Push to GHCR
           helm push netbird-exporter-${CHART_VERSION}.tgz oci://ghcr.io/${{ github.repository }}/charts
-
-      - name: Set up chart-releaser
-        uses: helm/chart-releaser-action@v1.5.0
-        with:
-          install_only: true
-
-      - name: Create GitHub Release
-        env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        run: |
-          # Get chart version
-          CHART_VERSION=$(grep 'version:' charts/netbird-exporter/Chart.yaml | awk '{print $2}')
-          echo "Chart version: $CHART_VERSION"
-
-          # Create .cr-release-packages directory
-          mkdir -p .cr-release-packages
-
-          # Copy the chart package to the expected location
-          cp netbird-exporter-${CHART_VERSION}.tgz .cr-release-packages/
-
-          # Upload chart to GitHub release
-          cr upload --package-path .cr-release-packages \
-            --owner $(echo ${{ github.repository }} | cut -d '/' -f 1) \
-            --git-repo $(echo ${{ github.repository }} | cut -d '/' -f 2) \
-            --token $CR_TOKEN
-
-          # Update index
-          cr index --owner $(echo ${{ github.repository }} | cut -d '/' -f 1) \
-            --git-repo $(echo ${{ github.repository }} | cut -d '/' -f 2) \
-            --token $CR_TOKEN \
-            --push
