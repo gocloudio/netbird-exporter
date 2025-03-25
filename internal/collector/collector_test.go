@@ -58,7 +58,7 @@ func TestNetBirdCollector(t *testing.T) {
 	}
 
 	// Create collector with mock client
-	collector := NewNetBirdCollector(mockClient)
+	collector := NewNetBirdCollector(mockClient, "")
 
 	// Test Describe method
 	ch := make(chan *prometheus.Desc, 4)
