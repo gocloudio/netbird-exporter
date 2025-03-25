@@ -14,6 +14,8 @@ This chart deploys the NetBird exporter as a DaemonSet, which exports metrics fr
 
 ## Installing the Chart
 
+### From Helm Repository
+
 Add the repository:
 
 ```bash
@@ -25,6 +27,22 @@ Install the chart:
 
 ```bash
 helm install netbird-exporter netbird-exporter/netbird-exporter
+```
+
+### From OCI Registry (Recommended)
+
+This chart is also available as an OCI artifact. You can install it directly from the GitHub Container Registry:
+
+```bash
+# Helm 3.8.0 or later
+helm install netbird-exporter oci://ghcr.io/gocloudio/netbird-exporter/charts/netbird-exporter --version 0.1.0
+```
+
+You can also pull the chart first:
+
+```bash
+helm pull oci://ghcr.io/gocloudio/netbird-exporter/charts/netbird-exporter --version 0.1.0
+helm install netbird-exporter ./netbird-exporter-0.1.0.tgz
 ```
 
 ## Configuration
@@ -57,6 +75,7 @@ The following table lists the configurable parameters of the NetBird exporter ch
 | `serviceMonitor.interval` | ServiceMonitor scrape interval | `30s` |
 | `serviceMonitor.scrapeTimeout` | ServiceMonitor scrape timeout | `10s` |
 | `serviceMonitor.endpointRelabelings` | ServiceMonitor relabelings | `[{"sourceLabels": ["__meta_kubernetes_pod_node_name"], "targetLabel": "node"}]` |
+| `serviceMonitor.implementation` | ServiceMonitor implementation type | `prometheus-operator` |
 
 ## Node Affinity and Tolerations
 
@@ -112,6 +131,18 @@ serviceMonitor:
   enabled: true
   additionalLabels:
     release: prometheus-stack
+```
+
+### VictoriaMetrics Operator
+
+The chart also supports VictoriaMetrics Operator for monitoring:
+
+```yaml
+serviceMonitor:
+  enabled: true
+  implementation: "victoriametrics"
+  additionalLabels:
+    release: victoria-metrics-stack
 ```
 
 ## Accessing Metrics

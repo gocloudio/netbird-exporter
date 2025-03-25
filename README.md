@@ -34,6 +34,22 @@ docker pull ghcr.io/gocloudio/netbird-exporter:latest
 docker run -p 9101:9101 -v /var/run/netbird.sock:/var/run/netbird.sock ghcr.io/gocloudio/netbird-exporter:latest
 ```
 
+### Using Helm Chart
+
+The NetBird Exporter can be deployed to Kubernetes using our Helm chart:
+
+```bash
+# From Helm Repository
+helm repo add netbird-exporter https://gocloudio.github.io/netbird-exporter
+helm repo update
+helm install netbird-exporter netbird-exporter/netbird-exporter
+
+# From OCI Registry (Recommended)
+helm install netbird-exporter oci://ghcr.io/gocloudio/netbird-exporter/charts/netbird-exporter --version 0.1.0
+```
+
+For more details on the Helm chart, see the [chart documentation](./charts/netbird-exporter/README.md).
+
 ### From Source
 
 ```bash
@@ -94,6 +110,17 @@ The Docker images are available from GitHub Container Registry with the followin
 - `ghcr.io/gocloudio/netbird-exporter:latest` - Latest stable build
 - `ghcr.io/gocloudio/netbird-exporter:v1.0.0` - Specific version
 - `ghcr.io/gocloudio/netbird-exporter:1.0` - Major.Minor version
+
+## Helm Chart
+
+The Helm chart is published in two formats:
+
+1. **Helm Repository** - Available at https://gocloudio.github.io/netbird-exporter
+2. **OCI Registry** - Available at `ghcr.io/gocloudio/netbird-exporter/charts/netbird-exporter`
+
+New chart versions are automatically published when:
+- Changes are made to files in the `charts/` directory on the main branch
+- A tag with the format `chart-v*` is pushed (e.g., `chart-v0.2.0`)
 
 ## Contributing
 
