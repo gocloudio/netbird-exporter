@@ -61,6 +61,24 @@ jobs:
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         run: |
+          # Get chart version
           CHART_VERSION=$(grep 'version:' charts/netbird-exporter/Chart.yaml | awk '{print $2}')
-          cr upload --package-path netbird-exporter-${CHART_VERSION}.tgz --owner $(echo ${{ github.repository }} | cut -d '/' -f 1) --git-repo $(echo ${{ github.repository }} | cut -d '/' -f 2) --token $CR_TOKEN
-          cr index --owner $(echo ${{ github.repository }} | cut -d '/' -f 1) --git-repo $(echo ${{ github.repository }} | cut -d '/' -f 2) --token $CR_TOKEN --push 
+          echo "Chart version: $CHART_VERSION"
+
+          # Create .cr-release-packages directory
+          mkdir -p .cr-release-packages
+
+          # Copy the chart package to the expected location
+          cp netbird-exporter-${CHART_VERSION}.tgz .cr-release-packages/
+
+          # Upload chart to GitHub release
+          cr upload --package-path .cr-release-packages \
+            --owner $(echo ${{ github.repository }} | cut -d '/' -f 1) \
+            --git-repo $(echo ${{ github.repository }} | cut -d '/' -f 2) \
+            --token $CR_TOKEN
+
+          # Update index
+          cr index --owner $(echo ${{ github.repository }} | cut -d '/' -f 1) \
+            --git-repo $(echo ${{ github.repository }} | cut -d '/' -f 2) \
+            --token $CR_TOKEN \
+            --push
