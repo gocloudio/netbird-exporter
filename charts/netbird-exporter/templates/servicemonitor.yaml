@@ -1,0 +1,30 @@
+{{- if .Values.serviceMonitor.enabled }}
+{{- if eq .Values.serviceMonitor.implementation "prometheus-operator" }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+{{- else if eq .Values.serviceMonitor.implementation "victoriametrics" }}
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+{{- else }}
+{{- fail "Invalid serviceMonitor.implementation value" }}
+{{- end }}
+metadata:
+  name: {{ include "netbird-exporter.fullname" . }}
+  labels:
+    {{- include "netbird-exporter.labels" . | nindent 4 }}
+    {{- with .Values.serviceMonitor.additionalLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "netbird-exporter.selectorLabels" . | nindent 6 }}
+  endpoints:
+  - port: http
+    interval: {{ .Values.serviceMonitor.interval }}
+    scrapeTimeout: {{ .Values.serviceMonitor.scrapeTimeout }}
+    {{- if .Values.serviceMonitor.endpointRelabelings }}
+    relabelings:
+      {{- toYaml .Values.serviceMonitor.endpointRelabelings | nindent 6 }}
+    {{- end }}
+{{- end }} 

@@ -1,0 +1,92 @@
+# Default values for netbird-exporter
+# This is a YAML-formatted file.
+
+image:
+  repository: ghcr.io/gocloudio/netbird-exporter
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# Update the service configuration to use service type
+service:
+  type: ClusterIP
+  port: 9101
+  # If using DaemonSet with hostNetwork, consider using a headless service
+  # type: ClusterIP
+  # clusterIP: None
+
+# By default, the exporter doesn't use hostNetwork (accesses socket via mounted volume)
+# If you need hostNetwork for specific scenarios, set this to true
+hostNetwork: false
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# Node selector for the DaemonSet
+# Specify this if NetBird is only running on specific nodes
+nodeSelector: {}
+  # netbird: "true"
+
+# Tolerations allow the DaemonSet to schedule onto nodes with taints
+# Common use case is to run on master/control-plane nodes
+tolerations:
+- operator: "Exists"
+  effect: "NoSchedule"
+
+affinity: {}
+
+# NetBird exporter configuration
+netbird:
+  # Unix socket path inside container
+  socket: "unix:///var/run/netbird.sock"
+  # Domain suffix to remove from FQDNs (e.g. .example.com)
+  ignoreFQDNDomain: ""
+
+# Host path for NetBird socket
+hostPathSocketDir: "/var/run"
+
+# Prometheus operator ServiceMonitor configuration
+serviceMonitor:
+  enabled: false
+  additionalLabels: {}
+  interval: 30s
+  scrapeTimeout: 10s
+  # Endpoint relabeling to add node name as a label
+  # This helps with identifying which node the metrics are from
+  endpointRelabelings:
+    - sourceLabels: ["__meta_kubernetes_pod_node_name"]
+      targetLabel: "node" 
+  implementation: "prometheus-operator"

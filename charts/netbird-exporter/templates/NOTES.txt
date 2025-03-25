@@ -1,0 +1,32 @@
+NetBird Exporter has been deployed as a DaemonSet.
+It will run on each node where NetBird is installed.
+
+To access the metrics from a specific pod:
+  export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "netbird-exporter.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME {{ .Values.service.port }}:{{ .Values.service.port }}
+  echo "Visit http://127.0.0.1:{{ .Values.service.port }}/metrics to see metrics"
+
+To access metrics via the service:
+  kubectl port-forward svc/{{ include "netbird-exporter.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }} -n {{ .Release.Namespace }}
+  echo "Visit http://127.0.0.1:{{ .Values.service.port }}/metrics to see metrics"
+
+{{- if .Values.serviceMonitor.enabled }}
+A ServiceMonitor has been created for Prometheus Operator.
+Metrics will be automatically collected by Prometheus if it matches the ServiceMonitor selector.
+{{- else }}
+To configure Prometheus to scrape these metrics, add the following to your scrape_configs:
+
+scrape_configs:
+  - job_name: netbird
+    kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+            - {{ .Release.Namespace }}
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_label_app_kubernetes_io_name]
+        regex: {{ include "netbird-exporter.name" . }}
+        action: keep
+      - source_labels: [__meta_kubernetes_pod_node_name]
+        target_label: node
+{{- end }} 

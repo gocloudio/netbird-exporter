@@ -1,0 +1,16 @@
+apiVersion: v2
+name: netbird-exporter
+description: A Helm chart for NetBird Prometheus Exporter
+type: application
+version: 0.1.0
+appVersion: "latest"
+home: https://github.com/gocloudio/netbird-exporter
+sources:
+  - https://github.com/gocloudio/netbird-exporter
+maintainers:
+  - name: GoCloudio
+keywords:
+  - netbird
+  - prometheus
+  - exporter
+  - monitoring 
