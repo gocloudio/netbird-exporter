@@ -55,6 +55,14 @@ jobs:
             type=sha,format=short
             type=ref,event=branch
             latest
+          labels: |
+            org.opencontainers.image.title=NetBird Exporter
+            org.opencontainers.image.description=A Prometheus exporter for NetBird peer metrics
+            org.opencontainers.image.vendor=GoCloudio
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.licenses=MIT
+            org.opencontainers.image.url=https://github.com/${{ github.repository }}
+            org.opencontainers.image.visibility=public
       
       - name: Build and push
         uses: docker/build-push-action@v4
